@@ -4,6 +4,8 @@ go 1.25.0
 
 require github.com/ethereum/go-ethereum v1.17.0
 
+require github.com/pkg/errors v0.9.1 // indirect
+
 require (
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/ProjectZKM/Ziren/crates/go-runtime/zkvm_runtime v0.0.0-20251001021608-1fe7b43fc4d6 // indirect
@@ -31,6 +33,7 @@ require (
 	github.com/huin/goupnp v1.3.0 // indirect
 	github.com/jackpal/go-nat-pmp v1.0.2 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
+	github.com/metachris/flashbotsrpc v0.7.1
 	github.com/minio/sha256-simd v1.0.0 // indirect
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
 	github.com/pion/dtls/v2 v2.2.7 // indirect
