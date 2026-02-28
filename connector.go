@@ -66,12 +66,11 @@ func (e *Extractor) TransactionDetails(hash common.Hash) {
 		data := tx.Data()
 		if len(data) >= 4 {
 			methodID := data[:4] // Les 4 premiers octets = la fonction
-
-			if METHODID[fmt.Sprintf("%x", methodID)] != "" {
-				fmt.Println(METHODID[fmt.Sprintf("%x", methodID)])
-
+			hexMethod := fmt.Sprintf("%x", methodID)
+			if METHODID[hexMethod] != nil {
+				fmt.Println(hexMethod)
+				METHODID[hexMethod](data)
 			}
-
 		}
 	}
 }

@@ -1,5 +1,6 @@
 package main
 
+/*
 import (
 	"context"
 	"fmt"
@@ -33,3 +34,4 @@ func SendToFlashbots(client *ethclient.Client, bundleTxs []string) {
 	}
 	fmt.Println("Bundle Hash:", res.BundleHash)
 }
+*/
