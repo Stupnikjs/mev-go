@@ -7,6 +7,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 )
 
+
+// beforeSwap afterSwap 
 func Scanner(data []byte) {
 	if len(data) < 4+32*3 { // Min: Selector + 2 montants + 1 offset
 		return
