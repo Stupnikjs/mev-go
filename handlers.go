@@ -1,41 +1,28 @@
 package main
 
 import (
-	"bytes"
-	"fmt"
-
 	"github.com/ethereum/go-ethereum/accounts/abi"
 )
+
+var ABIRegistry = make(map[string]abi.ABI)
 
 // --- UNISWAP UNIVERSAL ROUTER ---
 func UniversalRouterExecute(data []byte) {}
 
 // --- UNISWAP V2 / SUSHISWAP ---
 func V2SwapExactTokensForTokens(data []byte) {
-	// 1. Parser l'ABI
-	r := bytes.NewReader(data)
-	parsedABI, _ := abi.JSON(r)
-
-	// 2. Créer une map pour stocker les arguments
-	params := make(map[string]interface{})
-
-	// 3. Unpack (on ignore les 4 premiers octets du MethodID)
-	err := parsedABI.Methods["swapExactTokensForTokens"].Inputs.UnpackIntoMap(params, data)
-	if err != nil {
-		return
-	}
+	Scanner(data)
 
 }
 func V2SwapExactEthForTokens(data []byte) {
-	// 1. Parser l'ABI
-	r := bytes.NewReader(data)
-	parsedABI, _ := abi.JSON(r)
-
-	fmt.Println(parsedABI.Methods)
-	fmt.Println(parsedABI)
+	Scanner(data)
 }
-func V2SwapExactTokensForEth(data []byte) {}
-func V2SwapSupportingFee(data []byte)     {}
+func V2SwapExactTokensForEth(data []byte) {
+	Scanner(data)
+}
+func V2SwapSupportingFee(data []byte) {
+	Scanner(data)
+}
 
 // --- UNISWAP V3 ---
 func V3ExactInputSingle(data []byte)  {}
