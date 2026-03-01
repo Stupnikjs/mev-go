@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -14,14 +16,23 @@ import (
 
 // Provider represents a single RPC connection
 type Provider struct {
-	Name   string
-	Client *ethclient.Client
-	IsWS   bool
+	Name     string
+	Client   *ethclient.Client
+	IsWS     bool
+	healthy  atomic.Bool // true = OK
+	failures atomic.Int32
 }
 
 // Extractor holds our collection of connections
 type Extractor struct {
+	mu        sync.RWMutex
+	next      atomic.Uint64
+	c         Cache
 	Providers []*Provider
+}
+
+func (e *Extractor) FetchLastProvider() *ethclient.Client {
+	return e.Providers[len(e.Providers)-1].Client
 }
 
 // NewExtractor initializes connections to multiple endpoints
@@ -38,15 +49,20 @@ func NewExtractor(endpoints map[string]string) (*Extractor, error) {
 
 		// Check if it's a websocket connection for streaming
 		isWS := (url[:2] == "ws")
-
-		providers = append(providers, &Provider{
+		p := &Provider{
 			Name:   name,
 			Client: client,
-			IsWS:   isWS,
-		})
-	}
+			IsWS:   isWS}
+		p.healthy.Store(true)
+		providers = append(providers, p)
 
-	return &Extractor{Providers: providers}, nil
+	}
+	e := &Extractor{Providers: providers}
+	c := Cache{}
+	c.LoadCache()
+	e.c = c
+	// go e.startHealthChecker()
+	return e, nil
 }
 
 func (e *Extractor) TransactionDetails(hash common.Hash) {
@@ -64,14 +80,11 @@ func (e *Extractor) TransactionDetails(hash common.Hash) {
 
 	if isPending {
 		data := tx.Data()
-		if len(data) >= 4 {
-			methodID := data[:4] // Les 4 premiers octets = la fonction
-			hexMethod := fmt.Sprintf("%x", methodID)
-			if METHODID[hexMethod] != nil {
-				fmt.Println(hexMethod)
-				METHODID[hexMethod](data)
-			}
+		// methodID := hexutil.Encode(data[:4])
+		if len(data) > 40 {
+			e.ProcessCallData(data)
 		}
+
 	}
 }
 
@@ -111,22 +124,6 @@ func (e *Extractor) ListenToMempool() {
 			// You've caught a fish!
 			// Now you need to fetch the full transaction details.
 			go e.TransactionDetails(hash)
-		}
-	}
-}
-
-func (e *Extractor) ExtractDeepData(params []byte) {
-	// On scanne par blocs de 32 octets (format standard EVM)
-	for i := 0; i <= len(params)-32; i += 32 {
-		block := params[i : i+32]
-
-		// Les adresses ont 12 octets de zéros au début (padding)
-		// [000000000000][Adresse sur 20 octets]
-		potentialAddr := common.BytesToAddress(block[12:])
-
-		if potentialAddr != (common.Address{}) {
-			// Tu as trouvé un token ou un pool !
-			fmt.Printf("     📍 Adresse trouvée : %s\n", potentialAddr.Hex())
 		}
 	}
 }
