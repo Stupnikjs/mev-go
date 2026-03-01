@@ -31,10 +31,6 @@ type Extractor struct {
 	Providers []*Provider
 }
 
-func (e *Extractor) FetchLastProvider() *ethclient.Client {
-	return e.Providers[len(e.Providers)-1].Client
-}
-
 // NewExtractor initializes connections to multiple endpoints
 func NewExtractor(endpoints map[string]string) (*Extractor, error) {
 	var providers []*Provider

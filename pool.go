@@ -13,7 +13,6 @@ import (
 )
 
 var (
-
 	// ABI pour ERC20 balanceOf
 	erc20ABI, _ = abi.JSON(strings.NewReader(`[{"inputs":[{"name":"account","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"stateMutability":"view","type":"function"}]`))
 )
